@@ -57,19 +57,6 @@ def show_phone(args, book: AddressBook):
         return f"{name}: {phones}"
     return "Contact not found."
 
-
-@input_error
-def show_all(book: AddressBook):
-    if not book.data:
-        raise IndexError("No contacts in the address book.")
-
-    result = []
-    for name, record in book.data.items():
-        phones = ", ".join(phone.value for phone in record.phones)
-        result.append(f"{name}: {phones}")
-    return "\n".join(result)
-
-
 @input_error
 def add_birthday(args, book: AddressBook):
     if len(args) < 2:
@@ -95,13 +82,24 @@ def show_birthday(args, book: AddressBook):
         return f"{name}'s birthday is {record.birthday.value}."
     return f"No birthday set for {name}."
 
-@input_error
 def birthdays(args, book: AddressBook):
-    days = 7
+    days = int(args[0]) if args else 7
     upcoming = book.get_upcoming_birthday(days)
     if not upcoming:
         return "No birthdays in the next week."
+
     result = []
     for entry in upcoming:
-        result.append(f"{entry['name']} - {entry['birthday']}")
+        result.append(f"{entry['name']} - {entry['congratulation_date']}")
+    return "\n".join(result)
+
+@input_error
+def show_all(book: AddressBook):
+    if not book.data:
+        raise IndexError("No contacts in the address book.")
+
+    result = []
+    for name, record in book.data.items():
+        phones = ", ".join(phone.value for phone in record.phones)
+        result.append(f"{name}: {phones}, {record.birthday.value if record.birthday else ""}")
     return "\n".join(result)
